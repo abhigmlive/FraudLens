@@ -9,35 +9,35 @@
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
 <style>
   :root, [data-theme="light"] {
-    --bg: #f0f8ff;
+    --bg: #ffffff;
     --bg2: #ffffff;
-    --bg3: #e1f3fc;
-    --bg4: #cceeff;
-    --border: rgba(14,120,180,0.12);
-    --border2: rgba(14,120,180,0.22);
-    --text: #0d2d45;
-    --text2: #2a6080;
-    --text3: #6a9ab5;
-    --accent: #f46b00;
-    --accent2: #ffaa00;
+    --bg3: #f0f4f8;
+    --bg4: #e8eef6;
+    --border: rgba(3,37,72,0.10);
+    --border2: rgba(0,122,255,0.25);
+    --text: #032548;
+    --text2: #3a5a7a;
+    --text3: #757575;
+    --accent: #007AFF;
+    --accent2: #0051cc;
     --green: #1a8a56;
     --red: #d63030;
     --yellow: #c49000;
-    --blue: #0e87c8;
-    --purple: #6c3acd;
+    --blue: #007AFF;
+    --purple: #6C3382;
     --font: 'DM Mono', 'Fira Mono', 'Courier New', monospace;
     --sans: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
-    --sev-critical-bg: rgba(214,48,48,0.1); --sev-critical-col: #b02020; --sev-critical-bdr: rgba(214,48,48,0.3);
-    --sev-high-bg: rgba(244,107,0,0.12); --sev-high-col: #c25000; --sev-high-bdr: rgba(244,107,0,0.3);
-    --sev-med-bg: rgba(196,144,0,0.12); --sev-med-col: #9a6f00; --sev-med-bdr: rgba(196,144,0,0.3);
-    --sev-low-bg: rgba(14,135,200,0.12); --sev-low-col: #0a6fa0; --sev-low-bdr: rgba(14,135,200,0.3);
-    --anomaly-row-bdr: rgba(14,120,180,0.08);
-    --preview-td-bdr: rgba(14,120,180,0.06);
+    --sev-critical-bg: rgba(214,48,48,0.08); --sev-critical-col: #b02020; --sev-critical-bdr: rgba(214,48,48,0.25);
+    --sev-high-bg: rgba(108,51,130,0.09); --sev-high-col: #6C3382; --sev-high-bdr: rgba(108,51,130,0.25);
+    --sev-med-bg: rgba(0,122,255,0.08); --sev-med-col: #0051cc; --sev-med-bdr: rgba(0,122,255,0.25);
+    --sev-low-bg: rgba(117,117,117,0.08); --sev-low-col: #555555; --sev-low-bdr: rgba(117,117,117,0.2);
+    --anomaly-row-bdr: rgba(3,37,72,0.06);
+    --preview-td-bdr: rgba(3,37,72,0.05);
     --header-bg: #ffffff;
-    --toggle-bg: #e1f3fc;
+    --toggle-bg: #f0f4f8;
     --toggle-icon: "☀️";
-    --step-running-bg: rgba(244,107,0,0.08);
-    --upload-hover-bg: rgba(244,107,0,0.06);
+    --step-running-bg: rgba(0,122,255,0.06);
+    --upload-hover-bg: rgba(0,122,255,0.04);
   }
   [data-theme="dark"] {
     --bg: #0a0b0e;
@@ -250,6 +250,14 @@
   .new-analysis-btn { background: var(--bg3); color: var(--text2); border: 1px solid var(--border2); border-radius: 8px; padding: 8px 16px; font-size: 13px; cursor: pointer; font-family: var(--sans); transition: all 0.2s; }
   .new-analysis-btn:hover { color: var(--text); border-color: var(--border2); }
 
+  .export-excel-btn { display: flex; align-items: center; gap: 7px; background: #1a6b3a; color: #fff; border: 1px solid rgba(26,107,58,0.5); border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--sans); transition: all 0.2s; white-space: nowrap; }
+  .export-excel-btn:hover { background: #15572f; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,107,58,0.3); }
+  .export-excel-btn:active { transform: none; }
+  .export-excel-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+  .export-excel-btn.exporting { background: #0f4a26; }
+  .export-toast { position: fixed; bottom: 28px; right: 28px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px 20px; font-size: 13px; color: var(--text); box-shadow: 0 8px 32px rgba(0,0,0,0.18); display: flex; align-items: center; gap: 10px; z-index: 9999; animation: toastIn 0.3s ease; }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
   .risk-matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
   .risk-cell { padding: 10px; border-radius: 8px; text-align: center; }
   .risk-cell .risk-n { font-size: 22px; font-weight: 700; font-family: var(--font); }
@@ -290,7 +298,7 @@
       <input type="file" id="fileInput" accept=".xlsx,.xls,.csv,.tsv">
       <div class="upload-icon">📊</div>
       <div class="upload-title">Drop your file here</div>
-      <div class="upload-sub">Upload bank statements, invoices, transaction records, receipts,<br>or any financial spreadsheet for deep fraud analysis, Data won't leave your system and only browser memory will be used for analysis</div>
+      <div class="upload-sub">Upload bank statements, invoices, transaction records, receipts,<br>or any financial spreadsheet for deep fraud analysis</div>
       <div class="upload-formats">
         <span class="fmt-tag">.xlsx</span>
         <span class="fmt-tag">.xls</span>
@@ -372,9 +380,15 @@
 
 <!-- RESULTS -->
 <div id="results-panel">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
     <div style="font-size:13px; color:var(--text3); font-family:var(--font);" id="results-meta"></div>
-    <button class="new-analysis-btn" onclick="resetAll()">← New Analysis</button>
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <button class="export-excel-btn" id="exportBtn" onclick="exportToExcel()" title="Export all analysis to Excel workbook">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export to Excel
+      </button>
+      <button class="new-analysis-btn" onclick="resetAll()">← New Analysis</button>
+    </div>
   </div>
 
   <!-- SCORE HERO -->
@@ -1146,6 +1160,7 @@ function computeRiskScore(results) {
 // DISPLAY RESULTS
 // ============================================================
 function showResults(results) {
+  analysisResults = results;
   document.getElementById('results-panel').style.display = 'block';
   document.getElementById('results-meta').textContent = `${results.stats.totalRows.toLocaleString()} rows analyzed · ${Object.keys(columnMap).length} columns mapped`;
 
@@ -1540,6 +1555,778 @@ function fmtNum(n) {
 }
 
 // ============================================================
+// EXPORT TO EXCEL  — rich, chart-embedded, fully styled
+// ============================================================
+
+// Brand palette (matches new light theme)
+const XL = {
+  NAVY:    '032548',
+  BLUE:    '007AFF',
+  PURPLE:  '6C3382',
+  GREY:    '757575',
+  RED:     'C0392B',
+  GREEN:   '1A7A4A',
+  AMBER:   'B8860B',
+  WHITE:   'FFFFFF',
+  BG_ALT:  'F5F8FC',   // zebra stripe
+  BG_HDR:  'EAF1FB',   // sub-header tint
+};
+
+// ── cell style helpers ────────────────────────────────────────
+function xs(font={}, fill={}, align={}, border=true) {
+  const s = { font: { name:'Calibri', sz:10, ...font }, alignment: { wrapText:true, ...align } };
+  if (fill.rgb) s.fill = { patternType:'solid', fgColor:{ rgb: fill.rgb } };
+  if (border) s.border = {
+    top:{style:'thin',color:{rgb:'D0D8E4'}}, bottom:{style:'thin',color:{rgb:'D0D8E4'}},
+    left:{style:'thin',color:{rgb:'D0D8E4'}}, right:{style:'thin',color:{rgb:'D0D8E4'}}
+  };
+  return s;
+}
+function xsHdr(bgRgb, textRgb='FFFFFF') {
+  return xs({bold:true,color:{rgb:textRgb},sz:10}, {rgb:bgRgb}, {horizontal:'center'});
+}
+function xsTitle(bgRgb='032548') {
+  return xs({bold:true,color:{rgb:'FFFFFF'},sz:13}, {rgb:bgRgb}, {horizontal:'left'}, false);
+}
+function xsLabel() { return xs({bold:true,color:{rgb:'032548'},sz:10},{rgb:'EAF1FB'}); }
+function xsValue() { return xs({color:{rgb:'1a1a1a'},sz:10}); }
+function xsZebra(even) { return xs({sz:10}, even ? {rgb:'F5F8FC'} : {}); }
+function xsRisk(score) {
+  const rgb = score>=70 ? 'C0392B' : score>=40 ? '6C3382' : score>=20 ? 'B8860B' : '1A7A4A';
+  return xs({bold:true,color:{rgb:'FFFFFF'},sz:14},{rgb},{horizontal:'center'});
+}
+function xsSev(sev) {
+  const map = {critical:{rgb:'C0392B'},high:{rgb:'6C3382'},medium:{rgb:'007AFF'},low:{rgb:'757575'},info:{rgb:'757575'}};
+  const rgb = (map[sev]||map.info).rgb;
+  return xs({bold:true,color:{rgb:'FFFFFF'},sz:9},{rgb},{horizontal:'center'});
+}
+
+// Apply style to a cell
+function sc(sheet, addr, style) {
+  if (sheet[addr]) sheet[addr].s = style;
+}
+
+// Apply style to a whole row range
+function styleRow(sheet, row, startCol, endCol, style) {
+  for (let c=startCol; c<=endCol; c++) {
+    const addr = XLSX.utils.encode_cell({r:row,c});
+    if (!sheet[addr]) sheet[addr] = {t:'z',v:''};
+    sheet[addr].s = style;
+  }
+}
+
+// Set row height
+function setRowHeight(sheet, row, hpt) {
+  if (!sheet['!rows']) sheet['!rows'] = [];
+  sheet['!rows'][row] = { hpt };
+}
+
+// Merge cells helper
+function merge(sheet, r1, c1, r2, c2) {
+  if (!sheet['!merges']) sheet['!merges'] = [];
+  sheet['!merges'].push({s:{r:r1,c:c1},e:{r:r2,c:c2}});
+}
+
+// Write a cell with value + style
+function wc(sheet, r, c, v, s, t) {
+  const addr = XLSX.utils.encode_cell({r,c});
+  const type = t || (typeof v==='number'?'n':(v instanceof Date?'d':'s'));
+  sheet[addr] = {t:type, v, s};
+}
+
+// Capture a Chart.js canvas as base64 PNG
+function canvasToBase64(canvasId) {
+  try {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return null;
+    return canvas.toDataURL('image/png').split(',')[1];
+  } catch(e) { return null; }
+}
+
+// Add an image to a sheet at a given cell anchor (row, col)
+function addImage(wb, sheet, b64, anchorRow, anchorCol, widthPx, heightPx) {
+  if (!b64) return;
+  if (!wb.Workbook) wb.Workbook = {};
+  if (!sheet['!images']) sheet['!images'] = [];
+  sheet['!images'].push({
+    '!type': 'image',
+    '!data': b64,
+    '!datatype': 'base64',
+    '!ext': 'png',
+    '!pos': { r: anchorRow, c: anchorCol, x: 0, y: 0, w: widthPx, h: heightPx }
+  });
+}
+
+// ── main export ───────────────────────────────────────────────
+function exportToExcel() {
+  if (!analysisResults || !rawData.length) return;
+  const btn = document.getElementById('exportBtn');
+  btn.disabled = true;
+  btn.classList.add('exporting');
+  btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 0.8s linear infinite;flex-shrink:0"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Building workbook\u2026`;
+
+  setTimeout(() => {
+    try {
+      const wb = XLSX.utils.book_new();
+      const r = analysisResults;
+
+      // ═══════════════════════════════════════════════════════
+      // SHEET 1 — Raw Data
+      // ═══════════════════════════════════════════════════════
+      const rawSheet = XLSX.utils.json_to_sheet(rawData, { header: headers });
+      const rawRange = XLSX.utils.decode_range(rawSheet['!ref']);
+      // Header row style
+      for (let c=rawRange.s.c; c<=rawRange.e.c; c++) {
+        const addr = XLSX.utils.encode_cell({r:0,c});
+        if (rawSheet[addr]) rawSheet[addr].s = xsHdr(XL.NAVY);
+      }
+      setRowHeight(rawSheet, 0, 22);
+      // Zebra data rows
+      for (let row=1; row<=rawRange.e.r; row++) {
+        for (let col=rawRange.s.c; col<=rawRange.e.c; col++) {
+          const addr = XLSX.utils.encode_cell({r:row,c:col});
+          if (rawSheet[addr]) rawSheet[addr].s = xsZebra(row%2===0);
+          else { rawSheet[addr]={t:'z',v:''}; rawSheet[addr].s = xsZebra(row%2===0); }
+          setRowHeight(rawSheet, row, 16);
+        }
+      }
+      // Auto col widths
+      rawSheet['!cols'] = headers.map(h => {
+        const maxLen = rawData.reduce((mx,row) => Math.max(mx, String(row[h]||'').length), h.length);
+        return { wch: Math.min(38, Math.max(10, maxLen+2)) };
+      });
+      // Freeze header
+      rawSheet['!freeze'] = { xSplit: 0, ySplit: 1 };
+      XLSX.utils.book_append_sheet(wb, rawSheet, 'Raw Data');
+
+      // ═══════════════════════════════════════════════════════
+      // SHEET 2 — Analysis Summary (dashboard-style)
+      // ═══════════════════════════════════════════════════════
+      const s = r.score?.score || 0;
+      const riskLabel = s>=70?'HIGH RISK — INVESTIGATE':s>=40?'ELEVATED RISK':s>=20?'MODERATE — REVIEW':' LOW RISK';
+      const sevCounts = {critical:0,high:0,medium:0,low:0,info:0};
+      (r.findings||[]).forEach(f => { sevCounts[f.sev]=(sevCounts[f.sev]||0)+1; });
+
+      const sumSheet = { '!type': 'sheet' };
+      let row = 0;
+
+      // Title bar
+      wc(sumSheet,row,0,'FraudLens — Fraud Analysis Report',xsTitle(XL.NAVY),'s');
+      merge(sumSheet,row,0,row,5);
+      setRowHeight(sumSheet,row,28); row++;
+
+      wc(sumSheet,row,0,'Generated: '+new Date().toLocaleString(),xs({sz:9,color:{rgb:'AAAAAA'}},{}), 's');
+      merge(sumSheet,row,0,row,5); setRowHeight(sumSheet,row,14); row++;
+      row++; // blank
+
+      // Risk score box
+      wc(sumSheet,row,0,'FRAUD RISK SCORE',xsHdr(XL.NAVY),'s');
+      wc(sumSheet,row,1,s,xsRisk(s),'n');
+      wc(sumSheet,row,2,riskLabel,xs({bold:true,color:{rgb: s>=70?XL.RED:s>=40?XL.PURPLE:s>=20?XL.AMBER:XL.GREEN},sz:11},{rgb: s>=70?'FDECEA':s>=40?'F3E8F9':s>=20?'FEF9E7':'EAFAF1'},{horizontal:'left'}),'s');
+      merge(sumSheet,row,2,row,5);
+      setRowHeight(sumSheet,row,26); row++;
+      row++;
+
+      // Findings summary header
+      wc(sumSheet,row,0,'FINDINGS BY SEVERITY',xsHdr(XL.BLUE),'s');
+      wc(sumSheet,row,1,'Count',xsHdr(XL.BLUE),'s');
+      wc(sumSheet,row,2,'STATUS',xsHdr(XL.BLUE),'s');
+      merge(sumSheet,row,2,row,5);
+      setRowHeight(sumSheet,row,18); row++;
+
+      const sevRows = [
+        ['Critical',sevCounts.critical,sevCounts.critical>0?'⚠ ACTION REQUIRED':'✓ None'],
+        ['High',sevCounts.high,sevCounts.high>0?'⚠ Review urgently':'✓ None'],
+        ['Medium',sevCounts.medium,sevCounts.medium>0?'! Investigate':'✓ None'],
+        ['Low',sevCounts.low,sevCounts.low>0?'Review when possible':'✓ None'],
+      ];
+      sevRows.forEach(([lbl,cnt,status],i) => {
+        wc(sumSheet,row,0,lbl,xs({bold:true,sz:10},{rgb:i%2===0?'F5F8FC':''}),'s');
+        wc(sumSheet,row,1,cnt,xs({bold:true,sz:11,color:{rgb:cnt>0?XL.RED:XL.GREEN}},{rgb:i%2===0?'F5F8FC':''},{horizontal:'center'}),'n');
+        wc(sumSheet,row,2,status,xs({sz:10,color:{rgb:cnt>0?XL.RED:XL.GREEN}},{rgb:i%2===0?'F5F8FC':''}),'s');
+        merge(sumSheet,row,2,row,5);
+        setRowHeight(sumSheet,row,16); row++;
+      });
+      row++;
+
+      // Metrics table
+      wc(sumSheet,row,0,'ANALYSIS METRICS',xsHdr(XL.PURPLE),'s');
+      wc(sumSheet,row,1,'Result',xsHdr(XL.PURPLE),'s');
+      wc(sumSheet,row,2,'Interpretation',xsHdr(XL.PURPLE),'s');
+      merge(sumSheet,row,2,row,5);
+      setRowHeight(sumSheet,row,18); row++;
+
+      const metrics = [
+        ["Benford's Chi² Stat", r.benford?.chiSquare?.toFixed(2)||'N/A', r.benford?.chiSquare>15.5?'FAIL — Possible fabrication':'PASS — Natural distribution'],
+        ["Benford's MAD", r.benford?.mad?.toFixed(4)||'N/A', r.benford?.mad>0.015?'Nonconformity':r.benford?.mad>0.006?'Acceptable':'Close conformity'],
+        ['Statistical Outliers', r.outliers?.outliers.length||0, 'Transactions beyond 3σ / 3×IQR'],
+        ['Exact Duplicates', r.duplicates?.exact.length||0, 'Identical transaction pairs'],
+        ['Near-Duplicates', r.duplicates?.nearDups.length||0, 'Similar amount/vendor within 3 days'],
+        ['Round Number %', (r.round?.roundPct?.toFixed(1)||'0')+'%', r.round?.roundPct>30?'HIGH — Possible fabrication (norm <15%)':'Normal range'],
+        ['Threshold Hits', r.threshold?.hits.length||0, r.threshold?.hits.length>2?'Structuring pattern detected':'No structuring detected'],
+        ['ML Autoencoder Anomalies', r.ml?.scores?.filter(s=>s.isAnomaly).length||0, 'Multi-dimensional outliers'],
+        ['Weekend Transactions', r.temporal?.weekendCount||0, 'Transactions on Sat/Sun'],
+        ['Velocity Spike Days', r.temporal?.velocitySpikes.length||0, 'Days with abnormal volume'],
+        ['Sequence Gaps', r.sequence?.gaps.length||0, 'Missing invoice/ID numbers'],
+        ['Unique Vendors', r.vendor?.uniqueVendors||0, 'Distinct payees/merchants'],
+      ];
+      metrics.forEach(([lbl,val,note],i) => {
+        const even = i%2===0;
+        wc(sumSheet,row,0,lbl,xs({bold:true,sz:10},{rgb:even?'F5F8FC':''}),'s');
+        wc(sumSheet,row,1,val,xs({sz:10,color:{rgb:XL.NAVY}},{rgb:even?'F5F8FC':''},{horizontal:'center'}),typeof val==='number'?'n':'s');
+        wc(sumSheet,row,2,note,xs({sz:10},{rgb:even?'F5F8FC':''}),'s');
+        merge(sumSheet,row,2,row,5);
+        setRowHeight(sumSheet,row,16); row++;
+      });
+      row++;
+
+      // Column mapping
+      wc(sumSheet,row,0,'COLUMN MAPPING',xsHdr(XL.GREY),'s');
+      wc(sumSheet,row,1,'Mapped to',xsHdr(XL.GREY),'s');
+      merge(sumSheet,row,1,row,5);
+      setRowHeight(sumSheet,row,18); row++;
+      Object.entries(columnMap).forEach(([role,col],i) => {
+        wc(sumSheet,row,0,role,xs({bold:true,sz:10},{rgb:i%2===0?'F5F8FC':''}),'s');
+        wc(sumSheet,row,1,col,xs({sz:10},{rgb:i%2===0?'F5F8FC':''}),'s');
+        merge(sumSheet,row,1,row,5);
+        setRowHeight(sumSheet,row,15); row++;
+      });
+
+      sumSheet['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0},e:{r:row,c:5}});
+      sumSheet['!cols'] = [{wch:30},{wch:14},{wch:18},{wch:14},{wch:14},{wch:14}];
+      sumSheet['!freeze'] = {xSplit:0,ySplit:1};
+      XLSX.utils.book_append_sheet(wb, sumSheet, 'Analysis Summary');
+
+      // ═══════════════════════════════════════════════════════
+      // SHEET 3 — Findings (full detail)
+      // ═══════════════════════════════════════════════════════
+      const findSheet = {'!type':'sheet'};
+      let fr = 0;
+      wc(findSheet,fr,0,'Findings & Anomalies',xsTitle(XL.NAVY),'s');
+      merge(findSheet,fr,0,fr,4); setRowHeight(findSheet,fr,26); fr++;
+
+      wc(findSheet,fr,0,'Severity',xsHdr(XL.BLUE),'s');
+      wc(findSheet,fr,1,'Finding',xsHdr(XL.BLUE),'s');
+      wc(findSheet,fr,2,'Records',xsHdr(XL.BLUE),'s');
+      wc(findSheet,fr,3,'Description',xsHdr(XL.BLUE),'s');
+      merge(findSheet,fr,3,fr,4);
+      setRowHeight(findSheet,fr,18); fr++;
+
+      (r.findings||[]).forEach((f,i) => {
+        wc(findSheet,fr,0,f.sev.toUpperCase(),xsSev(f.sev),'s');
+        wc(findSheet,fr,1,f.title,xs({bold:true,sz:10},{rgb:i%2===0?'F5F8FC':''}),'s');
+        wc(findSheet,fr,2,f.count??'',xs({sz:10},{rgb:i%2===0?'F5F8FC':''},{horizontal:'center'}),typeof f.count==='number'?'n':'s');
+        wc(findSheet,fr,3,f.desc,xs({sz:9,color:{rgb:'444444'}},{rgb:i%2===0?'F5F8FC':''}),'s');
+        merge(findSheet,fr,3,fr,4);
+        setRowHeight(findSheet,fr,32); fr++;
+
+        // Sub-rows if any
+        if (f.rows && f.rows.length > 0) {
+          const keys = Object.keys(f.rows[0]);
+          // sub-header
+          wc(findSheet,fr,0,'',xs({}),s);
+          keys.forEach((k,ki) => wc(findSheet,fr,ki+1,k,xs({bold:true,sz:9,color:{rgb:XL.PURPLE}},{rgb:'F3E8F9'}),'s'));
+          setRowHeight(findSheet,fr,14); fr++;
+          f.rows.slice(0,15).forEach((rw,ri) => {
+            wc(findSheet,fr,0,'',xsZebra(ri%2===0),'s');
+            keys.forEach((k,ki) => {
+              const v = rw[k]??'';
+              const cleanV = String(v).replace(/[🔴🟡🔵]/g,'').trim();
+              const isFlag = String(v).includes('🔴')||String(v).includes('Extreme');
+              wc(findSheet,fr,ki+1,cleanV,xs({sz:9,color:{rgb:isFlag?XL.RED:'333333'}},{rgb:ri%2===0?'FAFAFA':''}),'s');
+            });
+            setRowHeight(findSheet,fr,14); fr++;
+          });
+        }
+      });
+
+      findSheet['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0},e:{r:fr,c:4}});
+      findSheet['!cols'] = [{wch:12},{wch:36},{wch:10},{wch:50},{wch:20}];
+      XLSX.utils.book_append_sheet(wb, findSheet, 'Findings');
+
+      // ═══════════════════════════════════════════════════════
+      // SHEET 4 — Benford's Law (data + embedded chart image)
+      // ═══════════════════════════════════════════════════════
+      if (r.benford) {
+        const bf = r.benford;
+        const bfSheet = {'!type':'sheet'};
+        let br = 0;
+
+        wc(bfSheet,br,0,"Benford's Law Analysis",xsTitle(XL.BLUE),'s');
+        merge(bfSheet,br,0,br,5); setRowHeight(bfSheet,br,26); br++;
+
+        // Summary metrics
+        const bfMeta = [
+          ['Chi² Statistic', bf.chiSquare.toFixed(4), 'Critical value', '15.507', 'p<0.05'],
+          ['MAD Score', bf.mad.toFixed(4), 'Interpretation', bf.mad>0.015?'Nonconformity':bf.mad>0.006?'Acceptable':'Close conformity',''],
+          ['Valid Samples', bf.valid, 'Result', bf.chiSquare>15.5?'FAIL':'PASS',''],
+        ];
+        bfMeta.forEach(([l1,v1,l2,v2,l3],i) => {
+          wc(bfSheet,br,0,l1,xsLabel(),'s'); wc(bfSheet,br,1,v1,xs({bold:true,sz:10,color:{rgb:bf.chiSquare>15.5&&i===0?XL.RED:XL.GREEN}},{},{horizontal:'right'}),i===2?'n':'s');
+          wc(bfSheet,br,2,l2,xsLabel(),'s'); wc(bfSheet,br,3,v2,xs({sz:10,color:{rgb:bf.chiSquare>15.5&&i===2?XL.RED:XL.GREEN}}),'s');
+          if(l3) wc(bfSheet,br,4,l3,xs({sz:9,color:{rgb:XL.GREY}}),'s');
+          setRowHeight(bfSheet,br,16); br++;
+        });
+        br++;
+
+        // Digit table header
+        ['Digit','Expected %','Actual %','Deviation %','Status'].forEach((h,ci) =>
+          wc(bfSheet,br,ci,h,xsHdr(XL.NAVY),'s'));
+        setRowHeight(bfSheet,br,18); br++;
+
+        bf.expected.forEach((exp,i) => {
+          const act = parseFloat(bf.actual[i].toFixed(2));
+          const dev = parseFloat((act-exp).toFixed(2));
+          const flag = Math.abs(dev)>5;
+          wc(bfSheet,br,0,i+1,xsZebra(i%2===0),'n');
+          wc(bfSheet,br,1,parseFloat(exp.toFixed(2)),xsZebra(i%2===0),'n');
+          wc(bfSheet,br,2,act,xsZebra(i%2===0),'n');
+          wc(bfSheet,br,3,dev,xs({sz:10,bold:flag,color:{rgb:flag?(dev>0?XL.RED:XL.PURPLE):XL.GREY}},{rgb:i%2===0?'F5F8FC':''}),'n');
+          wc(bfSheet,br,4,flag?'DEVIATION':'OK',xs({sz:9,bold:flag,color:{rgb:flag?XL.RED:XL.GREEN}},{rgb:flag?'FDECEA':i%2===0?'F5F8FC':''},{horizontal:'center'}),'s');
+          setRowHeight(bfSheet,br,15); br++;
+        });
+        br++;
+
+        // Embed Benford chart image (leave rows for it)
+        const bfImg = canvasToBase64('benfordChart');
+        if (bfImg) {
+          wc(bfSheet,br,0,'Chart: First-Digit Distribution',xsHdr(XL.BLUE),'s');
+          merge(bfSheet,br,0,br,5); setRowHeight(bfSheet,br,16); br++;
+          const imgStartRow = br;
+          for (let ri=0; ri<14; ri++) { setRowHeight(bfSheet,br,18); br++; }
+          addImage(wb, bfSheet, bfImg, imgStartRow, 0, 500, 240);
+        }
+
+        bfSheet['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0},e:{r:br,c:5}});
+        bfSheet['!cols'] = [{wch:10},{wch:14},{wch:12},{wch:14},{wch:12},{wch:8}];
+        XLSX.utils.book_append_sheet(wb, bfSheet, "Benford's Law");
+      }
+
+      // ═══════════════════════════════════════════════════════
+      // SHEET 5 — Outliers
+      // ═══════════════════════════════════════════════════════
+      if (r.outliers?.outliers.length > 0) {
+        const outSheet = {'!type':'sheet'};
+        let or2 = 0;
+        wc(outSheet,or2,0,'Statistical Outlier Report',xsTitle(XL.RED),'s');
+        merge(outSheet,or2,0,or2,4+headers.length); setRowHeight(outSheet,or2,26); or2++;
+
+        // Stats summary
+        const oStats = [
+          ['Mean Amount','$'+(r.outliers.mean||0).toFixed(2)],
+          ['Std Deviation','$'+(r.outliers.stdDev||0).toFixed(2)],
+          ['Q1','$'+(r.outliers.q1||0).toFixed(2)],
+          ['Q3','$'+(r.outliers.q3||0).toFixed(2)],
+          ['Total Outliers',r.outliers.outliers.length],
+          ['Extreme (>5σ)',r.outliers.extremes?.length||0],
+        ];
+        oStats.forEach(([l,v],i) => {
+          wc(outSheet,or2,i<3?i*2:( i-3)*2,l,xsLabel(),'s');
+          wc(outSheet,or2,i<3?i*2+1:(i-3)*2+1,v,xsValue(),i<3?'s':'n');
+          if(i===2) or2++;
+        });
+        or2++;
+
+        // Embed amount histogram
+        const histImg = canvasToBase64('amountHistChart');
+        if (histImg) {
+          wc(outSheet,or2,0,'Chart: Amount Distribution',xsHdr(XL.BLUE),'s');
+          merge(outSheet,or2,0,or2,5); setRowHeight(outSheet,or2,16); or2++;
+          const imgR = or2;
+          for(let ri=0;ri<12;ri++){setRowHeight(outSheet,or2,18);or2++;}
+          addImage(wb, outSheet, histImg, imgR, 0, 460, 200);
+        }
+        or2++;
+
+        // Table
+        const outCols = ['Row #','Amount','Z-Score','Flag',...headers];
+        outCols.forEach((h,ci) => wc(outSheet,or2,ci,h,xsHdr(XL.RED),'s'));
+        setRowHeight(outSheet,or2,18); or2++;
+
+        r.outliers.outliers.forEach((o,i) => {
+          const rawRow = headers.map(h => o.raw?.[h]??'');
+          const isExtreme = o.z>5;
+          const rowStyle = isExtreme
+            ? xs({sz:10,color:{rgb:XL.RED}},{rgb:'FDECEA'})
+            : xsZebra(i%2===0);
+          wc(outSheet,or2,0,o.row,rowStyle,'n');
+          wc(outSheet,or2,1,o.amount,rowStyle,'n');
+          wc(outSheet,or2,2,parseFloat(o.z.toFixed(4)),rowStyle,'n');
+          wc(outSheet,or2,3,isExtreme?'EXTREME':'HIGH',xs({bold:true,sz:9,color:{rgb:'FFFFFF'}},{rgb:isExtreme?XL.RED:XL.AMBER},{horizontal:'center'}),'s');
+          rawRow.forEach((v,ci) => wc(outSheet,or2,4+ci,v,rowStyle,'s'));
+          setRowHeight(outSheet,or2,15); or2++;
+        });
+
+        outSheet['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0},e:{r:or2,c:4+headers.length}});
+        outSheet['!cols'] = [{wch:8},{wch:14},{wch:10},{wch:10},...headers.map(h=>({wch:Math.max(10,h.length+2)}))];
+        XLSX.utils.book_append_sheet(wb, outSheet, 'Outliers');
+      }
+
+      // ═══════════════════════════════════════════════════════
+      // SHEET 6 — Duplicates
+      // ═══════════════════════════════════════════════════════
+      if (r.duplicates && (r.duplicates.exact.length>0 || r.duplicates.nearDups.length>0)) {
+        const dupSheet = {'!type':'sheet'};
+        let dr = 0;
+        wc(dupSheet,dr,0,'Duplicate Transaction Report',xsTitle(XL.PURPLE),'s');
+        merge(dupSheet,dr,0,dr,6); setRowHeight(dupSheet,dr,26); dr++;
+
+        wc(dupSheet,dr,0,'Exact Duplicates',xs({bold:true,sz:11,color:{rgb:XL.RED}}),'s');
+        wc(dupSheet,dr,1,r.duplicates.exact.length,xs({bold:true,sz:11,color:{rgb:XL.RED}},{},{horizontal:'center'}),'n');
+        wc(dupSheet,dr,3,'Near-Duplicates',xs({bold:true,sz:11,color:{rgb:XL.PURPLE}}),'s');
+        wc(dupSheet,dr,4,r.duplicates.nearDups.length,xs({bold:true,sz:11,color:{rgb:XL.PURPLE}},{},{horizontal:'center'}),'n');
+        setRowHeight(dupSheet,dr,20); dr++; dr++;
+
+        ['Type','Row 1','Row 2','Date','Amount','Vendor','Note'].forEach((h,ci) => wc(dupSheet,dr,ci,h,xsHdr(XL.PURPLE),'s'));
+        setRowHeight(dupSheet,dr,18); dr++;
+
+        r.duplicates.exact.forEach((d,i) => {
+          const s2=xs({sz:10,color:{rgb:XL.RED}},{rgb:i%2===0?'FEF0F0':''});
+          wc(dupSheet,dr,0,'EXACT',xs({bold:true,sz:9,color:{rgb:'FFFFFF'}},{rgb:XL.RED},{horizontal:'center'}),'s');
+          wc(dupSheet,dr,1,d.row1,s2,'n'); wc(dupSheet,dr,2,d.row2,s2,'n');
+          wc(dupSheet,dr,3,d.date||'',s2,'s'); wc(dupSheet,dr,4,d.amount||'',s2,'s');
+          wc(dupSheet,dr,5,d.vendor||'',s2,'s'); wc(dupSheet,dr,6,d.note||'',s2,'s');
+          setRowHeight(dupSheet,dr,15); dr++;
+        });
+        r.duplicates.nearDups.forEach((d,i) => {
+          const s2=xs({sz:10,color:{rgb:XL.PURPLE}},{rgb:i%2===0?'F9F0FD':''});
+          wc(dupSheet,dr,0,'NEAR-DUP',xs({bold:true,sz:9,color:{rgb:'FFFFFF'}},{rgb:XL.PURPLE},{horizontal:'center'}),'s');
+          wc(dupSheet,dr,1,d.row1,s2,'n'); wc(dupSheet,dr,2,d.row2,s2,'n');
+          wc(dupSheet,dr,3,'',s2,'s'); wc(dupSheet,dr,4,d.amount||'',s2,'s');
+          wc(dupSheet,dr,5,d.vendor||'',s2,'s'); wc(dupSheet,dr,6,d.note||'',s2,'s');
+          setRowHeight(dupSheet,dr,15); dr++;
+        });
+
+        dupSheet['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0},e:{r:dr,c:6}});
+        dupSheet['!cols'] = [{wch:10},{wch:8},{wch:8},{wch:14},{wch:14},{wch:28},{wch:44}];
+        XLSX.utils.book_append_sheet(wb, dupSheet, 'Duplicates');
+      }
+
+      // ═══════════════════════════════════════════════════════
+      // SHEET 7 — Amount & Threshold Charts
+      // ═══════════════════════════════════════════════════════
+      const amtSheet = {'!type':'sheet'};
+      let ar = 0;
+      wc(amtSheet,ar,0,'Amount Analysis',xsTitle(XL.BLUE),'s');
+      merge(amtSheet,ar,0,ar,5); setRowHeight(amtSheet,ar,26); ar++;
+
+      // Threshold summary table
+      if (r.threshold) {
+        wc(amtSheet,ar,0,'Threshold Proximity Hits',xsHdr(XL.PURPLE),'s');
+        merge(amtSheet,ar,0,ar,5); setRowHeight(amtSheet,ar,18); ar++;
+        ['Row #','Amount','Near Threshold','Gap','Flag',...headers.slice(0,2)].forEach((h,ci)=>
+          wc(amtSheet,ar,ci,h,xsHdr(XL.NAVY),'s'));
+        setRowHeight(amtSheet,ar,16); ar++;
+        r.threshold.hits.slice(0,30).forEach((h,i) => {
+          const rawRow = headers.slice(0,2).map(col=>h.raw?.[col]??'');
+          wc(amtSheet,ar,0,h.row,xsZebra(i%2===0),'n');
+          wc(amtSheet,ar,1,h.amount,xsZebra(i%2===0),'n');
+          wc(amtSheet,ar,2,h.threshold,xsZebra(i%2===0),'n');
+          wc(amtSheet,ar,3,h.gap,xs({sz:10,color:{rgb:XL.RED}},{rgb:i%2===0?'F5F8FC':''}),'n');
+          wc(amtSheet,ar,4,h.note||'',xs({sz:9,color:{rgb:XL.PURPLE}},{rgb:i%2===0?'F5F8FC':''}),'s');
+          rawRow.forEach((v,ci)=>wc(amtSheet,ar,5+ci,v,xsZebra(i%2===0),'s'));
+          setRowHeight(amtSheet,ar,15); ar++;
+        });
+        ar++;
+      }
+
+      // Embed threshold chart
+      const thrImg = canvasToBase64('thresholdChart');
+      if (thrImg) {
+        wc(amtSheet,ar,0,'Chart: Threshold Proximity',xsHdr(XL.BLUE),'s');
+        merge(amtSheet,ar,0,ar,5); setRowHeight(amtSheet,ar,16); ar++;
+        const thr1 = ar;
+        for(let i=0;i<13;i++){setRowHeight(amtSheet,ar,18);ar++;}
+        addImage(wb, amtSheet, thrImg, thr1, 0, 460, 210);
+      }
+      ar++;
+
+      // Round number summary
+      if (r.round) {
+        wc(amtSheet,ar,0,'Round Number Analysis',xsHdr(XL.GREY),'s');
+        merge(amtSheet,ar,0,ar,5); setRowHeight(amtSheet,ar,18); ar++;
+        const rndMeta = [
+          ['Total Transactions',rawData.length],['Round Numbers (.00)',r.round.roundCount],
+          ['Round %',(r.round.roundPct||0).toFixed(1)+'%'],['Benchmark','<15%'],
+          ['Assessment',r.round.roundPct>60?'HIGH RISK':r.round.roundPct>30?'ELEVATED':'NORMAL'],
+        ];
+        rndMeta.forEach(([l,v],i) => {
+          wc(amtSheet,ar,i<3?i*2:(i-3)*2,l,xsLabel(),'s');
+          wc(amtSheet,ar,i<3?i*2+1:(i-3)*2+1,String(v),xsValue(),'s');
+          if(i===2) ar++;
+        });
+        ar++;
+      }
+
+      // Embed round chart
+      const rndImg = canvasToBase64('roundChart');
+      if (rndImg) {
+        wc(amtSheet,ar,0,'Chart: Round Number Distribution',xsHdr(XL.BLUE),'s');
+        merge(amtSheet,ar,0,ar,5); setRowHeight(amtSheet,ar,16); ar++;
+        const rnd1 = ar;
+        for(let i=0;i<13;i++){setRowHeight(amtSheet,ar,18);ar++;}
+        addImage(wb, amtSheet, rndImg, rnd1, 0, 460, 210);
+      }
+
+      // Embed vendor chart
+      const vendImg = canvasToBase64('vendorChart');
+      if (vendImg) {
+        ar++;
+        wc(amtSheet,ar,0,'Chart: Vendor Concentration',xsHdr(XL.BLUE),'s');
+        merge(amtSheet,ar,0,ar,5); setRowHeight(amtSheet,ar,16); ar++;
+        const vnd1 = ar;
+        for(let i=0;i<14;i++){setRowHeight(amtSheet,ar,18);ar++;}
+        addImage(wb, amtSheet, vendImg, vnd1, 0, 460, 230);
+      }
+
+      amtSheet['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0},e:{r:ar,c:5+headers.length}});
+      amtSheet['!cols'] = [{wch:10},{wch:14},{wch:14},{wch:12},{wch:36},{wch:20}];
+      XLSX.utils.book_append_sheet(wb, amtSheet, 'Amount Analysis');
+
+      // ═══════════════════════════════════════════════════════
+      // SHEET 8 — Temporal Analysis + Charts
+      // ═══════════════════════════════════════════════════════
+      if (r.temporal) {
+        const tmpSheet = {'!type':'sheet'};
+        let tr = 0;
+        wc(tmpSheet,tr,0,'Temporal Pattern Analysis',xsTitle(XL.NAVY),'s');
+        merge(tmpSheet,tr,0,tr,4); setRowHeight(tmpSheet,tr,26); tr++;
+
+        wc(tmpSheet,tr,0,'Weekend Transactions',xsLabel(),'s');
+        wc(tmpSheet,tr,1,r.temporal.weekendCount,xs({bold:true,sz:12,color:{rgb:r.temporal.weekendCount>10?XL.RED:XL.GREEN}}),'n');
+        wc(tmpSheet,tr,2,'Velocity Spikes',xsLabel(),'s');
+        wc(tmpSheet,tr,3,r.temporal.velocitySpikes.length,xs({bold:true,sz:12,color:{rgb:r.temporal.velocitySpikes.length>0?XL.AMBER:XL.GREEN}}),'n');
+        setRowHeight(tmpSheet,tr,20); tr++; tr++;
+
+        // Day of week table
+        wc(tmpSheet,tr,0,'Day-of-Week Breakdown',xsHdr(XL.NAVY),'s');
+        ['Day','Count','Avg Amount'].forEach((h,ci)=>wc(tmpSheet,tr,ci,h,xsHdr(XL.NAVY),'s'));
+        merge(tmpSheet,tr,0,tr,0); setRowHeight(tmpSheet,tr,18); tr++;
+        ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].forEach((day,i)=>{
+          const even=i%2===0;
+          wc(tmpSheet,tr,0,day,xs({bold:i===0||i===6,sz:10,color:{rgb:i===0||i===6?XL.RED:XL.NAVY}},{rgb:even?'F5F8FC':''}),'s');
+          wc(tmpSheet,tr,1,r.temporal.byDow?.[i]?.count||0,xsZebra(even),'n');
+          wc(tmpSheet,tr,2,r.temporal.byDow?.[i]?.avgAmt?'$'+r.temporal.byDow[i].avgAmt.toFixed(2):'N/A',xsZebra(even),'s');
+          setRowHeight(tmpSheet,tr,15); tr++;
+        });
+        tr++;
+
+        // Embed temporal charts
+        const dowImg = canvasToBase64('dowChart');
+        if (dowImg) {
+          wc(tmpSheet,tr,0,'Chart: Transactions by Day of Week',xsHdr(XL.BLUE),'s');
+          merge(tmpSheet,tr,0,tr,4); setRowHeight(tmpSheet,tr,16); tr++;
+          const d1=tr; for(let i=0;i<13;i++){setRowHeight(tmpSheet,tr,18);tr++;}
+          addImage(wb, tmpSheet, dowImg, d1, 0, 460, 210);
+        }
+        tr++;
+        const tlImg = canvasToBase64('timelineChart');
+        if (tlImg) {
+          wc(tmpSheet,tr,0,'Chart: Daily Transaction Volume',xsHdr(XL.BLUE),'s');
+          merge(tmpSheet,tr,0,tr,4); setRowHeight(tmpSheet,tr,16); tr++;
+          const tl1=tr; for(let i=0;i<13;i++){setRowHeight(tmpSheet,tr,18);tr++;}
+          addImage(wb, tmpSheet, tlImg, tl1, 0, 460, 210);
+        }
+        tr++;
+        const mlyImg = canvasToBase64('monthlyChart');
+        if (mlyImg) {
+          wc(tmpSheet,tr,0,'Chart: Monthly Pattern',xsHdr(XL.BLUE),'s');
+          merge(tmpSheet,tr,0,tr,4); setRowHeight(tmpSheet,tr,16); tr++;
+          const ml1=tr; for(let i=0;i<13;i++){setRowHeight(tmpSheet,tr,18);tr++;}
+          addImage(wb, tmpSheet, mlyImg, ml1, 0, 460, 210);
+        }
+        tr++;
+
+        // Weekend rows sample
+        if (r.temporal.weekendRows?.length > 0) {
+          wc(tmpSheet,tr,0,'Weekend Transaction Sample',xsHdr(XL.RED),'s');
+          merge(tmpSheet,tr,0,tr,3); setRowHeight(tmpSheet,tr,16); tr++;
+          ['Row','Date','Amount','Day'].forEach((h,ci)=>wc(tmpSheet,tr,ci,h,xsHdr(XL.NAVY),'s'));
+          setRowHeight(tmpSheet,tr,16); tr++;
+          r.temporal.weekendRows.slice(0,30).forEach((w,i)=>{
+            wc(tmpSheet,tr,0,w.row,xsZebra(i%2===0),'n');
+            wc(tmpSheet,tr,1,w.date,xsZebra(i%2===0),'s');
+            wc(tmpSheet,tr,2,w.amount||'',xsZebra(i%2===0),'s');
+            wc(tmpSheet,tr,3,w.day||'',xs({sz:10,bold:true,color:{rgb:XL.RED}},{rgb:i%2===0?'F5F8FC':''}),'s');
+            setRowHeight(tmpSheet,tr,15); tr++;
+          });
+          tr++;
+        }
+
+        // Velocity spikes
+        if (r.temporal.velocitySpikes?.length > 0) {
+          wc(tmpSheet,tr,0,'Velocity Spike Days',xsHdr(XL.AMBER),'s');
+          merge(tmpSheet,tr,0,tr,3); setRowHeight(tmpSheet,tr,16); tr++;
+          ['Date','Count','Z-Score','Flag'].forEach((h,ci)=>wc(tmpSheet,tr,ci,h,xsHdr(XL.NAVY),'s'));
+          setRowHeight(tmpSheet,tr,16); tr++;
+          r.temporal.velocitySpikes.forEach((v,i)=>{
+            wc(tmpSheet,tr,0,v.date,xsZebra(i%2===0),'s');
+            wc(tmpSheet,tr,1,v.count,xsZebra(i%2===0),'n');
+            wc(tmpSheet,tr,2,parseFloat((v.z||0).toFixed(2)),xsZebra(i%2===0),'n');
+            wc(tmpSheet,tr,3,v.z>4?'EXTREME SPIKE':'HIGH',xs({bold:true,sz:9,color:{rgb:'FFFFFF'}},{rgb:v.z>4?XL.RED:XL.AMBER},{horizontal:'center'}),'s');
+            setRowHeight(tmpSheet,tr,15); tr++;
+          });
+        }
+
+        tmpSheet['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0},e:{r:tr,c:4}});
+        tmpSheet['!cols'] = [{wch:24},{wch:12},{wch:16},{wch:12},{wch:12}];
+        XLSX.utils.book_append_sheet(wb, tmpSheet, 'Temporal Analysis');
+      }
+
+      // ═══════════════════════════════════════════════════════
+      // SHEET 9 — ML Anomalies + scatter chart
+      // ═══════════════════════════════════════════════════════
+      if (r.ml?.scores?.length > 0) {
+        const mlSheet = {'!type':'sheet'};
+        let mr = 0;
+        wc(mlSheet,mr,0,'ML Autoencoder Anomaly Report',xsTitle(XL.PURPLE),'s');
+        merge(mlSheet,mr,0,mr,4); setRowHeight(mlSheet,mr,26); mr++;
+
+        const mlMeta = [
+          ['Model','TensorFlow.js Autoencoder'],['Epochs Trained',r.ml.epochs],
+          ['Features Used',r.ml.numFeatures],['Threshold',r.ml.threshold?.toFixed(5)||'N/A'],
+          ['Total Anomalies',r.ml.scores.filter(s=>s.isAnomaly).length],
+        ];
+        mlMeta.forEach(([l,v],i)=>{
+          wc(mlSheet,mr,i<3?i*2:(i-3)*2,l,xsLabel(),'s');
+          wc(mlSheet,mr,i<3?i*2+1:(i-3)*2+1,v,xs({bold:true,sz:10,color:{rgb:XL.PURPLE}},{}),typeof v==='number'?'n':'s');
+          if(i===2) mr++;
+        });
+        mr++;
+
+        // Embed scatter chart
+        const scImg = canvasToBase64('mlScatterChart');
+        if (scImg) {
+          wc(mlSheet,mr,0,'Chart: Reconstruction Error Scatter',xsHdr(XL.PURPLE),'s');
+          merge(mlSheet,mr,0,mr,4); setRowHeight(mlSheet,mr,16); mr++;
+          const sc1=mr; for(let i=0;i<15;i++){setRowHeight(mlSheet,mr,18);mr++;}
+          addImage(wb, mlSheet, scImg, sc1, 0, 520, 250);
+        }
+        mr++;
+
+        // All scores table
+        wc(mlSheet,mr,0,'Transaction Anomaly Scores',xsHdr(XL.PURPLE),'s');
+        merge(mlSheet,mr,0,mr,4); setRowHeight(mlSheet,mr,16); mr++;
+        ['Row #','Amount','Reconstruction Error','Anomaly?','Severity'].forEach((h,ci)=>
+          wc(mlSheet,mr,ci,h,xsHdr(XL.NAVY),'s'));
+        setRowHeight(mlSheet,mr,18); mr++;
+
+        r.ml.scores.forEach((sc,i)=>{
+          const isAno = sc.isAnomaly;
+          const rowBg = isAno?(sc.score>r.ml.threshold*2?'FDECEA':'F9F0FD'):(i%2===0?'F5F8FC':'');
+          const rowFg = isAno?(sc.score>r.ml.threshold*2?XL.RED:XL.PURPLE):'333333';
+          const baseS = xs({sz:10,color:{rgb:rowFg}},{rgb:rowBg});
+          wc(mlSheet,mr,0,sc.row||i+1,baseS,'n');
+          wc(mlSheet,mr,1,sc.amount||'',baseS,'s');
+          wc(mlSheet,mr,2,parseFloat(sc.score.toFixed(6)),baseS,'n');
+          wc(mlSheet,mr,3,isAno?'YES':'no',xs({bold:isAno,sz:10,color:{rgb:isAno?'FFFFFF':'666666'}},{rgb:isAno?(sc.score>r.ml.threshold*2?XL.RED:XL.PURPLE):''},{ horizontal:'center'}),'s');
+          wc(mlSheet,mr,4,isAno?(sc.score>r.ml.threshold*2?'EXTREME':'HIGH'):'Normal',xs({sz:9,color:{rgb:rowFg}},{rgb:rowBg}),'s');
+          setRowHeight(mlSheet,mr,14); mr++;
+        });
+
+        mlSheet['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0},e:{r:mr,c:4}});
+        mlSheet['!cols'] = [{wch:10},{wch:16},{wch:24},{wch:10},{wch:12}];
+        XLSX.utils.book_append_sheet(wb, mlSheet, 'ML Anomalies');
+      }
+
+      // ═══════════════════════════════════════════════════════
+      // SHEET 10 — Vendor Analysis
+      // ═══════════════════════════════════════════════════════
+      if (r.vendor?.topVendors?.length > 0) {
+        const vSheet = {'!type':'sheet'};
+        let vr = 0;
+        wc(vSheet,vr,0,'Vendor Concentration Analysis',xsTitle(XL.NAVY),'s');
+        merge(vSheet,vr,0,vr,3); setRowHeight(vSheet,vr,26); vr++;
+        wc(vSheet,vr,0,'Unique Vendors',xsLabel(),'s');
+        wc(vSheet,vr,1,r.vendor.uniqueVendors,xs({bold:true,sz:12,color:{rgb:XL.BLUE}}),'n');
+        setRowHeight(vSheet,vr,20); vr++; vr++;
+
+        wc(vSheet,vr,0,'Vendor',xsHdr(XL.NAVY),'s');
+        wc(vSheet,vr,1,'Total Spend',xsHdr(XL.NAVY),'s');
+        wc(vSheet,vr,2,'Txn Count',xsHdr(XL.NAVY),'s');
+        wc(vSheet,vr,3,'Flag',xsHdr(XL.NAVY),'s');
+        setRowHeight(vSheet,vr,18); vr++;
+        r.vendor.topVendors.forEach((v,i)=>{
+          const conc = r.vendor.concentrated?.some(c=>c.vendor===v.vendor);
+          wc(vSheet,vr,0,v.vendor,xs({sz:10,bold:conc},{rgb:conc?'F9F0FD':i%2===0?'F5F8FC':''}),'s');
+          wc(vSheet,vr,1,v.total,xs({sz:10},{rgb:conc?'F9F0FD':i%2===0?'F5F8FC':''}),'s');
+          wc(vSheet,vr,2,v.count,xs({sz:10},{rgb:conc?'F9F0FD':i%2===0?'F5F8FC':''},{horizontal:'center'}),typeof v.count==='number'?'n':'s');
+          wc(vSheet,vr,3,conc?'CONCENTRATED':'',xs({bold:conc,sz:9,color:{rgb:conc?'FFFFFF':'666666'}},{rgb:conc?XL.PURPLE:''},{ horizontal:'center'}),'s');
+          setRowHeight(vSheet,vr,15); vr++;
+        });
+
+        vSheet['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0},e:{r:vr,c:3}});
+        vSheet['!cols'] = [{wch:38},{wch:16},{wch:12},{wch:16}];
+        XLSX.utils.book_append_sheet(wb, vSheet, 'Vendor Analysis');
+      }
+
+      // ═══════════════════════════════════════════════════════
+      // SHEET 11 — Sequence Gaps
+      // ═══════════════════════════════════════════════════════
+      if (r.sequence?.gaps?.length > 0) {
+        const sqSheet = {'!type':'sheet'};
+        let sqr = 0;
+        wc(sqSheet,sqr,0,'Sequence Gap Analysis',xsTitle(XL.GREY),'s');
+        merge(sqSheet,sqr,0,sqr,2); setRowHeight(sqSheet,sqr,26); sqr++;
+        wc(sqSheet,sqr,0,'Total Gaps Found',xsLabel(),'s');
+        wc(sqSheet,sqr,1,r.sequence.gaps.length,xs({bold:true,sz:12,color:{rgb:XL.RED}}),'n');
+        setRowHeight(sqSheet,sqr,20); sqr++; sqr++;
+        ['Gap From','Gap To','Missing Count'].forEach((h,ci)=>wc(sqSheet,sqr,ci,h,xsHdr(XL.NAVY),'s'));
+        setRowHeight(sqSheet,sqr,18); sqr++;
+        r.sequence.gaps.forEach((g,i)=>{
+          wc(sqSheet,sqr,0,g.from,xsZebra(i%2===0),'s');
+          wc(sqSheet,sqr,1,g.to,xsZebra(i%2===0),'s');
+          wc(sqSheet,sqr,2,g.count,xs({sz:10,bold:true,color:{rgb:XL.RED}},{rgb:i%2===0?'FEF0F0':''},{horizontal:'center'}),'n');
+          setRowHeight(sqSheet,sqr,15); sqr++;
+        });
+        sqSheet['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0},e:{r:sqr,c:2}});
+        sqSheet['!cols'] = [{wch:22},{wch:22},{wch:16}];
+        XLSX.utils.book_append_sheet(wb, sqSheet, 'Sequence Gaps');
+      }
+
+      // ── Write & download ──────────────────────────────────
+      const fileName = `FraudLens_Report_${new Date().toISOString().slice(0,10)}.xlsx`;
+      XLSX.writeFile(wb, fileName, { bookType:'xlsx', type:'binary', cellStyles:true });
+      showExportToast('Exported ' + wb.SheetNames.length + ' sheets → ' + fileName);
+
+    } catch(err) {
+      showExportToast('Export failed: ' + err.message, true);
+      console.error('Export error:', err);
+    } finally {
+      const btn = document.getElementById('exportBtn');
+      btn.disabled = false;
+      btn.classList.remove('exporting');
+      btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export to Excel`;
+    }
+  }, 60);
+}
+
+function headerStyleRow(sheet, rowIdx, numCols, hexColor) {
+  for (let c = 0; c < numCols; c++) {
+    const addr = XLSX.utils.encode_cell({ r: rowIdx, c });
+    if (sheet[addr]) {
+      sheet[addr].s = {
+        font: { bold: true, color: { rgb: 'FFFFFF' } },
+        fill: { patternType:'solid', fgColor: { rgb: hexColor } },
+        alignment: { horizontal: 'left' }
+      };
+    }
+  }
+}
+
+function showExportToast(msg, isError) {
+  const existing = document.getElementById('export-toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.id = 'export-toast';
+  toast.className = 'export-toast';
+  toast.style.borderColor = isError ? 'rgba(214,48,48,0.4)' : 'rgba(0,122,255,0.4)';
+  toast.innerHTML = `<span style="font-size:16px">${isError ? '❌' : '✅'}</span><span>${msg}</span>`;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.4s'; setTimeout(() => toast.remove(), 400); }, 4500);
+}
+
+// ============================================================
 // THEME TOGGLE
 // ============================================================
 function toggleTheme() {
@@ -1556,8 +2343,8 @@ function setTheme(theme) {
   document.getElementById('icon-moon').style.opacity = isDark ? '1' : '0.35';
   // Re-render any active charts with new grid colors if results visible
   if (document.getElementById('results-panel').style.display !== 'none') {
-    const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(14,120,180,0.07)';
-    const tickColor = isDark ? '#8b92a8' : '#6a9ab5';
+    const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,122,255,0.07)';
+    const tickColor = isDark ? '#8b92a8' : '#757575';
     Object.values(activeCharts).forEach(chart => {
       if (chart.options.scales) {
         Object.values(chart.options.scales).forEach(scale => {
